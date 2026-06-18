@@ -1,3 +1,22 @@
+## 0.10.0 (2026-06-18)
+
+
+### Features
+
+* Rust-based implementation of `openjd.model._v1` and `openjd.expr` are now available via PyO3 ([`3d853e5`](https://github.com/OpenJobDescription/openjd-model-for-python/commit/3d853e542dbee4e4c707044fc145dad8bcd138b4))
+  * **`openjd.expr`**: New expression evaluation namespace: `evaluate_expression`, `parse_expression`, path mapping (`PathFormat`, `PathMappingRule`), range expressions, symbol tables, and typed error hierarchy.
+  * **`openjd.model._v1`**: Rust-backed model layer with submodules: `.template`, `.job`, `.types`, `.errors`. Includes `decode_job_template`, `create_job`, capability validators, and all template/job types.
+  * Introduces a Rust extension module (`openjd._openjd_rs`) built with PyO3/maturin, providing a high-performance reimplementation of the OpenJD model and expression engine.
+  * **Opt-in by import path**: The existing `openjd.model` (pure-Python) is unchanged. Consumers opt into the Rust implementation by importing from `openjd.model._v1` or `openjd.expr` directly.
+  * Currently experimental: the `_v1` prefix signals this API may evolve before stabilizing.
+
+### Bug Fixes
+
+* make userInterface control field optional for all parameter types ([#278](https://github.com/OpenJobDescription/openjd-model-for-python/pull/278)) ([`5e10e2c`](https://github.com/OpenJobDescription/openjd-model-for-python/commit/5e10e2c036d79bd5a0548600055d33107c0eaa04))
+* require attribute and amount names to be unique ([#265](https://github.com/OpenJobDescription/openjd-model-for-python/pull/265)) ([`c5ba60e`](https://github.com/OpenJobDescription/openjd-model-for-python/commit/c5ba60e8c85abf1f0c1226df96830c042d5beff5))
+* reject control characters in job names ([#263](https://github.com/OpenJobDescription/openjd-model-for-python/pull/263)) ([`0d428c4`](https://github.com/OpenJobDescription/openjd-model-for-python/commit/0d428c4febde028ba49793e75ead12a398205f8d))
+
+
 ## 0.9.1 (2026-02-20)
 
 
