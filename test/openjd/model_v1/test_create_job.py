@@ -8,7 +8,6 @@ import pytest
 from pathlib import Path
 from typing import Any, Optional
 
-from openjd.expr import ExpressionError
 from openjd.model._v1 import (
     CallerLimits,
     ModelProfile,
@@ -2931,9 +2930,10 @@ class TestCreateJobLetFailureMessages:
 
     @pytest.mark.parametrize("where", ["step", "job environment"])
     def test_the_diagnostic_is_the_same_for_both(self, where: str) -> None:
-        with pytest.raises(ExpressionError) as excinfo:
+        with pytest.raises(ModelValidationError) as excinfo:
             create_job(job_template=self._decoded(where), job_parameter_values={"X": "0", "N": "1"})
-        assert str(excinfo.value) == self._EXPECTED
+        loc = "steps[0]" if where == "step" else "jobEnvironments[0]"
+        assert str(excinfo.value) == self._EXPECTED.format(loc=loc)
 
     @pytest.mark.parametrize("where", ["step", "job environment"])
     def test_a_value_that_evaluates_creates_the_job(self, where: str) -> None:
