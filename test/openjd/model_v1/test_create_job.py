@@ -8,7 +8,6 @@ import pytest
 from pathlib import Path
 from typing import Any, Optional
 
-from openjd.expr import ExpressionError
 from openjd.model._v1 import (
     CallerLimits,
     ModelProfile,
@@ -2906,7 +2905,15 @@ class TestCreateJobLetFailureMessages:
     """
 
     _LET = ["q = 1 / int(Param.X)"]
-    _EXPECTED = "script let binding 'q': Division by zero\n  1 / int(Param.X)\n  ~~^~~~~~~~~~~~~~"
+    # openjd-model 0.13.0 reports a failing ``let`` binding at job creation as a
+    # located ModelValidationError, the same way for a step and a job environment.
+    _EXPECTED = (
+        "1 validation error for JobTemplate\n"
+        "{loc} -> script -> let[0]:\n"
+        "\tInvalid expression in let binding 'q': Division by zero\n"
+        "  q = 1 / int(Param.X)\n"
+        "      ~~^~~~~~~~~~~~~~"
+    )
 
     @classmethod
     def _decoded(cls, where: str) -> Any:
@@ -2931,9 +2938,10 @@ class TestCreateJobLetFailureMessages:
 
     @pytest.mark.parametrize("where", ["step", "job environment"])
     def test_the_diagnostic_is_the_same_for_both(self, where: str) -> None:
-        with pytest.raises(ExpressionError) as excinfo:
+        with pytest.raises(ModelValidationError) as excinfo:
             create_job(job_template=self._decoded(where), job_parameter_values={"X": "0", "N": "1"})
-        assert str(excinfo.value) == self._EXPECTED
+        loc = "steps[0]" if where == "step" else "jobEnvironments[0]"
+        assert str(excinfo.value) == self._EXPECTED.format(loc=loc)
 
     @pytest.mark.parametrize("where", ["step", "job environment"])
     def test_a_value_that_evaluates_creates_the_job(self, where: str) -> None:
