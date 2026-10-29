@@ -2901,11 +2901,19 @@ class TestCreateJobLetFailureMessages:
     """openjd-model 0.10.1 (openjd-rs#410) evaluates a job environment's ``let`` under
     the caller's profile with the same diagnostic as a step script's ``let``. On
     0.10.0 the environment form read ``Error evaluating let binding 'q': ...`` and
-    quoted the whole binding, ``q = 1 / int(Param.X)``.
+    quoted the whole binding, ``q = 1 / int(Param.X)``. From openjd-model 0.13.0 both
+    forms are reported at the binding's path as ``Invalid expression in let binding``
+    and quote the whole binding.
     """
 
     _LET = ["q = 1 / int(Param.X)"]
-    _EXPECTED = "script let binding 'q': Division by zero\n  1 / int(Param.X)\n  ~~^~~~~~~~~~~~~~"
+    _EXPECTED = (
+        "1 validation error for JobTemplate\n"
+        "{loc} -> script -> let[0]:\n"
+        "\tInvalid expression in let binding 'q': Division by zero\n"
+        "  q = 1 / int(Param.X)\n"
+        "      ~~^~~~~~~~~~~~~~"
+    )
 
     @classmethod
     def _decoded(cls, where: str) -> Any:
