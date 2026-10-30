@@ -348,7 +348,7 @@ class TestUnknownListLiterals:
         with pytest.raises(ExpressionError) as exc_info:
             evaluate_expression("[X, Y]", values=values)
         expected = [
-            "List literal contains incompatible types: int, string\n",
+            "List literal contains incompatible types: int and string\n",
             "  [X, Y]\n",
             "  ^~~~~~",
         ]
