@@ -485,7 +485,7 @@ def _validate_model_template_variable_references(
 
         errors.extend(
             _validate_model_template_variable_references(
-                field_model,
+                cast(Type, field_model),
                 field_value,
                 field_scope,
                 symbol_prefix,
@@ -1011,7 +1011,7 @@ def _collect_variable_definitions(  # noqa: C901  (suppress: too complex)
         discriminator = field_info.discriminator
 
         symbols[field_name] = _collect_variable_definitions(
-            field_model,
+            cast(Type, field_model),
             field_value,
             current_scope,
             symbol_prefix,
