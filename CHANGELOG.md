@@ -1,3 +1,13 @@
+## 0.15.0 (2026-11-04)
+
+
+### Features
+* Bump openjd-* Rust crates to the openjd-model 0.14.0 release ([`d207fe1`](https://github.com/seant-aws/openjd-model-for-python/commit/d207fe111050443d76efc7935c05cc067200f339))
+
+### Bug Fixes
+* Adopt nullable comprehension types and canonical range form ([`a9dcde5`](https://github.com/seant-aws/openjd-model-for-python/commit/a9dcde548daa9ce0e939288a0ffc3521c9f5bc6e))
+
+
 ## 0.14.0 (2026-10-15)
 
 
