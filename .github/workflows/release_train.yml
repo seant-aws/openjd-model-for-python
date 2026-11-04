@@ -9,15 +9,26 @@
 #
 # A PR the train opens has its CI held until a maintainer approves the run; review and merge it as usual.
 # The merge (a push to the default branch) runs this workflow, which tells the train.
+#
+# What runs it: the train itself dispatches it (workflow_dispatch) as soon as it has work here, a merge
+# pushes, and a release made outside the train completes "Release: Publish". The daily schedule is only
+# the backstop for an event that went missing.
 name: Release train
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    # Daily backstop, off the hour.
+    - cron: "17 6 * * *"
   workflow_dispatch:
   push:
     # The default branch: a merged bot PR is reported right away instead of on the next schedule.
     branches: [rt-ci]
+  # A maintainer's own release: the train sees it without waiting for the schedule. The run is only a signal:
+  # it runs this file from the default branch with the default branch's OIDC subject, and the reusable
+  # workflow reads nothing of the run that triggered it (no artifact, head ref or event payload).
+  workflow_run: # zizmor: ignore[dangerous-triggers]
+    workflows: ["Release: Publish"]
+    types: [completed]
 
 # One run at a time per repository; a run that finds nothing to do takes a few seconds.
 concurrency:
