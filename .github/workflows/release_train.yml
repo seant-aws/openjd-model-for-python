@@ -1,18 +1,19 @@
 # The OpenJD release train for this repository. The train runs in AWS and holds no GitHub credential: this
 # workflow asks it what to do (start a train for a new upstream release, push a bot/* branch, open its PR,
-# notice a merge, tag a release) and does the GitHub writes with this job's GITHUB_TOKEN. All the logic
-# and its checks live in the reusable workflow; this caller only sets the triggers and forwards the
-# mode variable and the role secret.
+# notice a merge, dispatch Release: Bump) and does the GitHub writes with this job's GITHUB_TOKEN. All the logic
+# and its checks live in the reusable workflow; this caller only sets the triggers and forwards the variables
+# and secrets.
 #
-# Turned on per repository with the variable RELEASE_TRAIN_ENABLED=true; RELEASE_TRAIN_MODE names the
-# train's mode and the secret RELEASE_TRAIN_ROLE the AWS role that may invoke the train's gateway.
+# Inert until an admin sets the variable RELEASE_TRAIN_ENABLED=true (the job is skipped otherwise).
+# RELEASE_TRAIN_MODE names the train's mode, the secret RELEASE_TRAIN_ROLE the AWS role that may invoke the
+# train's gateway.
 #
-# A PR the train opens has its CI held until a maintainer approves the run; review and merge it as usual.
-# The merge (a push to the default branch) runs this workflow, which tells the train.
+# A PR the train opens has its CI held until a maintainer approves the run; review and squash-merge it as
+# usual. The merge (a push to the default branch) runs this workflow, which tells the train.
 #
-# What runs it: the train itself dispatches it (workflow_dispatch) as soon as it has work here, a merge
-# pushes, and a release made outside the train completes "Release: Publish". The daily schedule is only
-# the backstop for an event that went missing.
+# What runs it: a merge pushes, the repository's own "Release: Publish" completing, an upstream repository's
+# run after its release (workflow_dispatch), and a person (workflow_dispatch). A run that started or advanced
+# a train waits for the train's next step. The daily schedule is the backstop for an event that went missing.
 name: Release train
 
 on:
@@ -23,9 +24,9 @@ on:
   push:
     # The default branch: a merged bot PR is reported right away instead of on the next schedule.
     branches: [rt-ci]
-  # A maintainer's own release: the train sees it without waiting for the schedule. The run is only a signal:
-  # it runs this file from the default branch with the default branch's OIDC subject, and the reusable
-  # workflow reads nothing of the run that triggered it (no artifact, head ref or event payload).
+  # A release: the train sees it without waiting for the schedule. The run is only a signal: it runs this file
+  # from the default branch with the default branch's OIDC subject, and the reusable workflow reads nothing of
+  # the run that triggered it (no artifact, head ref or event payload).
   workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: ["Release: Publish"]
     types: [completed]
@@ -40,17 +41,21 @@ permissions: {}
 jobs:
   train:
     if: ${{ vars.RELEASE_TRAIN_ENABLED == 'true' }}
-    # Our own reusable workflow, referenced by branch like every aws-deadline/.github workflow (the org's
-    # zizmor policy allows that ref pin for aws-deadline/*); this fork test points at a fork branch.
+    # This fork test points at a fork branch of the reusable workflow.
     uses: seant-aws/.github/.github/workflows/reusable_release_train.yml@release-train # zizmor: ignore[unpinned-uses]
     permissions:
-      contents: write # push bot/* branches; create tags and releases
+      contents: write # push bot/* branches; create tags and releases (rehearsal only)
       pull-requests: write # open and update the train's PRs and their labels
-      actions: write # dispatch the repo's own release workflow (reserved)
+      actions: write # dispatch this repository's own Release: Bump (live mode)
       id-token: write # OIDC tokens for the AWS role and the gateway
     with:
       mode: ${{ vars.RELEASE_TRAIN_MODE }}
       tooling_repository: seant-aws/.github
       tooling_ref: release-train
+      # The repositories this one may start after a release (also on the train's own allowlist).
+      dispatch_repos: "seant-aws/openjd-sessions-for-python seant-aws/openjd-cli"
     secrets:
       role_arn: ${{ secrets.RELEASE_TRAIN_ROLE }}
+      # A token that may run workflows in dispatch_repos. Optional: without it the downstream
+      # repositories are not dispatched and their daily run picks a release up.
+      dispatch_token: ${{ secrets.RELEASE_TRAIN_DISPATCH_TOKEN }}
