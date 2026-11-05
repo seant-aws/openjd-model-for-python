@@ -1,3 +1,10 @@
+## 0.15.0 (2026-11-05)
+
+
+### BREAKING CHANGES
+* The bundled Rust bindings now use openjd-model 0.14.0 and openjd-expr 0.13.0 (previously 0.13.0 and 0.12.0); behaviour follows those upstream releases. Format-string errors for an unknown symbol now list every equally close candidate in their "Did you mean one of: ..." hint (#10)
+
+
 ## 0.14.0 (2026-10-15)
 
 
