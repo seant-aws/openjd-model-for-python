@@ -16,11 +16,9 @@ def closest(symbols: set[str], match: str) -> tuple[int, set[str]]:
     best_match = set()
     for sym in symbols:
         distance = _edit_distance(sym, match)
-        if distance < best_cost:
+        if distance <= best_cost:
             best_cost = distance
-            best_match = set((sym,))
-        elif distance == best_cost:
-            best_match.add(sym)
+            best_match = {sym}
     return best_cost, best_match
 
 
