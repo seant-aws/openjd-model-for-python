@@ -1019,6 +1019,9 @@ class TestNoncontiguousChunkRendering:
     the same integers, which is why nothing caught the divergence; the rendered
     text is what a task sees in ``{{Task.Param.Frame}}``.
 
+    openjd-model 0.14.0 (openjd-rs#469) writes NONCONTIGUOUS chunks in the
+    canonical form of Template Schemas 3.4.1.1.1, so ``[1, 2, 4, 6]`` renders
+    as ``1,2-6:2`` and ``[1, 3, 4, 5]`` as ``1,3-5``.
     Expected values are the v0 reference's output for the same template, checked
     by running both paths side by side when this test was written.
     """
@@ -1062,8 +1065,8 @@ class TestNoncontiguousChunkRendering:
     @pytest.mark.parametrize(
         "range_values, expected",
         [
-            pytest.param(["1", "2", "4", "6"], "1,2,4,6", id="pair then even progression"),
-            pytest.param(["1", "3", "4", "5"], "1,3,4,5", id="gap then consecutive run"),
+            pytest.param(["1", "2", "4", "6"], "1,2-6:2", id="pair then even progression"),
+            pytest.param(["1", "3", "4", "5"], "1,3-5", id="gap then consecutive run"),
             pytest.param(["7", "8"], "7,8", id="lone pair"),
             pytest.param(["1", "3", "5", "7"], "1-7:2", id="control: uniform step compresses"),
         ],
