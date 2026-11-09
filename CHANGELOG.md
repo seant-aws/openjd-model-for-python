@@ -1,3 +1,10 @@
+## 0.15.2 (2026-11-09)
+
+
+### Bug Fixes
+* Validation errors for invalid capability names now quote the name exactly as written in the template (e.g. `Amount.GPU-Count`) instead of lowercasing it. Names are still matched case-insensitively. (#14)
+
+
 ## 0.15.1 (2026-11-09)
 
 
