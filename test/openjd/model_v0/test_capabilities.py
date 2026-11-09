@@ -1,8 +1,9 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 import pytest
+import re
 import string
-from typing import Union
+from typing import Callable, Union
 
 from openjd.model import validate_amount_capability_name, validate_attribute_capability_name
 from openjd.model.v2023_09 import FormatString, ModelParsingContext as ModelParsingContext_v2023_09
@@ -138,3 +139,20 @@ class TestValidateAttributeCapabilityName:
             validate_attribute_capability_name(
                 capability_name=value, standard_capabilities=TEST_BUILTIN_ATTRIBUTES
             )
+
+
+class TestCapabilityNameErrorMessage:
+    @pytest.mark.parametrize(
+        "validate, value",
+        [
+            pytest.param(validate_amount_capability_name, "Amount.GPU-Count", id="amount"),
+            pytest.param(validate_attribute_capability_name, "Vendor:Attr.My Attr", id="attr"),
+        ],
+    )
+    def test_names_the_value_as_written(self, validate: Callable[..., None], value: str) -> None:
+        # The message quotes the name as the template wrote it, not lowercased.
+        with pytest.raises(
+            ValueError,
+            match=re.escape(f"Value is not a valid Capability name: {value!r}"),
+        ):
+            validate(capability_name=value, standard_capabilities=[])
