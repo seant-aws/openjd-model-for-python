@@ -18,11 +18,11 @@ def _coerce_bool_value(value: Any) -> bool:
     if isinstance(value, int):  # bool already handled above
         if value in (0, 1):
             return bool(value)
-        raise ValueError("BOOL value as an integer must be 0 or 1.")
+        raise ValueError(f"BOOL value as an integer must be 0 or 1, got {value}.")
     if isinstance(value, float):
         if value in (0.0, 1.0):
             return bool(value)
-        raise ValueError("BOOL value as a float must be 0.0 or 1.0.")
+        raise ValueError(f"BOOL value as a float must be 0.0 or 1.0, got {value}.")
     if isinstance(value, str):
         low = value.lower()
         if low in _BOOL_TRUE_STRINGS:
@@ -31,6 +31,10 @@ def _coerce_bool_value(value: Any) -> bool:
             return False
         raise ValueError(
             "BOOL value as a string must be one of (case-insensitive): "
-            "true, false, yes, no, on, off, 1, 0."
+            f"true, false, yes, no, on, off, 1, 0; got {value!r}."
         )
-    raise ValueError("BOOL value must be a boolean, 0/1, 0.0/1.0, or a boolean string.")
+    # Name only the type: the value of an unsupported type (a list, a mapping) can be arbitrarily large.
+    raise ValueError(
+        "BOOL value must be a boolean, 0/1, 0.0/1.0, or a boolean string, "
+        f"got {type(value).__name__}."
+    )
