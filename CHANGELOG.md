@@ -1,3 +1,10 @@
+## 0.15.1 (2026-11-09)
+
+
+### Bug Fixes
+* When a BOOL job parameter gets a value it can't accept, the error message now shows the submitted value (the integer, float or string). For unsupported types it shows the type name instead. Before, the message only listed the accepted forms, so you had to find the bad value yourself. (#12)
+
+
 ## 0.15.0 (2026-11-05)
 
 
