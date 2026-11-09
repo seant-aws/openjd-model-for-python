@@ -29,9 +29,11 @@ def _validate_capability_name(
     # validate when those values are substituted.
     if isinstance(capability_name, FormatString) and len(capability_name.expressions) > 0:
         return
+    # Keep the name as written for the error message; matching is case-insensitive.
+    given_name = str(capability_name)
     capability_name = capability_name.lower()
     if _name_regex.fullmatch(capability_name) is None:
-        raise ValueError(f"Value is not a valid Capability name: {capability_name}")
+        raise ValueError(f"Value is not a valid Capability name: {given_name!r}")
     vendor, capability = _split_vendor(capability_name)
 
     if not vendor and capability in standard_capabilities:
