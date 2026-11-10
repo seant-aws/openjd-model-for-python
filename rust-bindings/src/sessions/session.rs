@@ -422,15 +422,17 @@ impl PySession {
 
     /// Extend the session's path mapping rules with additional rules.
     ///
-    /// Rules are stored sorted by source-path length (longest first) so that
-    /// the most specific rule matches first during FormatString resolution.
+    /// Rules are appended after the existing ones; the rule whose source
+    /// path names the most components wins, and between rules for the same
+    /// location the one given last wins.
     ///
     /// Consumers (notably the Deadline Cloud worker agent's Job Attachments
     /// download action) call this after an action assigns additional path
     /// mappings — e.g. per-storage-profile mappings derived at task-sync time.
     ///
     /// Returns an error if an action is currently in-flight (the underlying
-    /// Session has been taken by a background thread). Call this between
+    /// Session has been taken by a background thread), or if an added rule
+    /// is invalid (for example a relative source path). Call this between
     /// actions.
     fn extend_path_mapping_rules(
         &self,
@@ -444,7 +446,9 @@ impl PySession {
         })?;
         let rules: Vec<openjd_expr::path_mapping::PathMappingRule> =
             additional.into_iter().map(|p| p.inner).collect();
-        session.extend_path_mapping_rules(rules);
+        session
+            .extend_path_mapping_rules(rules)
+            .map_err(session_err_to_py)?;
         Ok(())
     }
 
