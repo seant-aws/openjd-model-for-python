@@ -201,6 +201,7 @@ class TestFloatTaskParameterDefinition:
         either literals (Python ``float``) or ``FormatString``s."""
         step = _decode_step(
             extensions=["EXPR"],
+            parameter_definitions=[{"name": "X", "type": "FLOAT"}],
             parameter_space={
                 "taskParameterDefinitions": [
                     {
