@@ -54,8 +54,10 @@ impl PyIntRange {
         self.inner.step()
     }
 
-    fn __len__(&self) -> usize {
-        self.inner.len()
+    fn __len__(&self) -> PyResult<usize> {
+        usize::try_from(self.inner.len()).map_err(|_| {
+            pyo3::exceptions::PyOverflowError::new_err("range is too long for len()")
+        })
     }
 
     fn __contains__(&self, value: i64) -> bool {
@@ -205,8 +207,10 @@ impl PyRangeExpr {
             .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Range expression is empty"))
     }
 
-    fn __len__(&self) -> usize {
-        self.inner.len()
+    fn __len__(&self) -> PyResult<usize> {
+        usize::try_from(self.inner.len()).map_err(|_| {
+            pyo3::exceptions::PyOverflowError::new_err("range expression is too long for len()")
+        })
     }
 
     fn __eq__(&self, other: &PyRangeExpr) -> bool {
@@ -218,19 +222,18 @@ impl PyRangeExpr {
     }
 
     fn __getitem__(&self, index: isize) -> PyResult<i64> {
-        let len = self.inner.len();
-        let idx = if index < 0 {
-            len as isize + index
-        } else {
-            index
-        };
-        if idx < 0 || idx as usize >= len {
+        let len = i128::from(self.inner.len());
+        let index = index as i128;
+        let idx = if index < 0 { len + index } else { index };
+        if idx < 0 || idx >= len {
             return Err(pyo3::exceptions::PyIndexError::new_err(
                 "index out of range",
             ));
         }
+        let idx = i64::try_from(idx)
+            .map_err(|_| pyo3::exceptions::PyIndexError::new_err("index out of range"))?;
         self.inner
-            .get(idx as i64)
+            .get(idx)
             .ok_or_else(|| pyo3::exceptions::PyIndexError::new_err("index out of range"))
     }
 
