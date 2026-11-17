@@ -626,7 +626,7 @@ class ProductNodeIter(NodeIterator):
             # 1 with a carry.
             # We advance the right-most parameter by one. If that overflows (i.e.
             # hits the end of the iterator) then we reset its iterator and advance
-            # the next parameter to its left. Repeating as neccessary until we have
+            # the next parameter to its left. Repeating as necessary until we have
             # hit the end of the left-most iterator -- which indicates the end of
             # the product iteration.
 
