@@ -52,8 +52,8 @@ jobs:
       id-token: write # OIDC tokens for the AWS role and the gateway
     with:
       mode: ${{ vars.RELEASE_TRAIN_MODE }}
-      tooling_repository: seant-aws/openjd-dot-github
-      tooling_ref: release-train-workflow
+      # This fork test releases from rt-ci (upstream callers keep the default, mainline).
+      release_branch: rt-ci
       # The repositories this one may start after a release (also on the train's own allowlist).
       dispatch_repos: "seant-aws/openjd-sessions-for-python seant-aws/openjd-cli"
     secrets:
