@@ -1,3 +1,10 @@
+## 0.15.3 (2026-11-17)
+
+
+### Bug Fixes
+* correct a typo in a comment ([`d5979c5`](https://github.com/seant-aws/openjd-model-for-python/commit/d5979c581e973502d7b542f48fd653ab211f7e61))
+
+
 ## 0.15.2 (2026-11-09)
 
 
