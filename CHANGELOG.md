@@ -1,3 +1,31 @@
+## 0.15.0 (2026-11-18)
+
+
+### BREAKING CHANGES
+* Python 3.9 is no longer supported. The package now requires Python 3.10 or later. (#389)
+* The Rust bindings now use openjd-expr 0.16.0 and openjd-sessions 0.11.0, matching the openjd-model 0.16.1 release. (#20)
+* The Rust bindings moved through openjd-expr 0.14/0.15, openjd-model 0.15/0.16 and openjd-sessions 0.9/0.10. The release notes below list the behavior changes this brings. (`713af01`)
+* INT and CHUNK[INT] range list elements in templates now come back as either an int or a FormatString, the same way FLOAT elements already did and the same as the pure-Python model. (`32fbcb2`)
+* The non-blocking Session actions (`enter_environment`, `exit_environment`, `run_task`, `run_subprocess`) now raise an error when the session refuses the call. Before, a refused call returned as if an action had started, ran nothing, and left the previous action's status showing. This is common after a failed action, when the session stays READY_ENDING. (`5e56e0e`)
+* Calling `cancel_action` a second time while a session is already CANCELING now raises an invalid-state error. The pure-Python Session accepts the second call and shortens the grace period to the new time limit; this binding can't shorten a cancel that is already in progress. (`cf1e387`)
+* Float formatting changed. A FLOAT parameter default given as a number now prints with a decimal point (2 becomes "2.0"). Shortest-digit ties now round to even, like Python's repr (1000000000000000.25 becomes 1000000000000000.2). This affects computed floats, FLOAT values and LIST[FLOAT] items. (`0a7a092`)
+* `RangeExpr` is now always kept in canonical form: `str`, `repr` and `ranges()` return the canonical runs, and equality compares values. Every constructor limits the canonical form to 50,000 runs. (`942b571`)
+* Path mapping rules now match whole path components. A UNC share (`\\srv\share`) must match as a whole, so a rooted path like `\srv\share\x` no longer matches it. WINDOWS paths now compare the way Windows compares file names, ignoring case for non-ASCII letters too. When several rules map the same location, the last one wins. (`d26bb25`)
+* Paths longer than 32,768 bytes are now limited. `PathMappingRule.apply` returns no match for them, the `apply_path_mapping` expression function raises `ExpressionError`, and a session errors on such a PATH or LIST[PATH] value. A rule whose source or destination path is longer than the limit is invalid. (`539455f`)
+
+### Features
+* Added `Session.clear_ending_only` to the sessions binding. (`5e56e0e`)
+* Parsing invalid expressions is much faster: it now takes time roughly linear in the expression's length, so `decode_job_template` no longer slows down badly on malformed expressions. (`713af01`)
+* Range expressions now accept any 64-bit integer except the most negative one; before, values of 2**62 and up raised an overflow error. Up to 50,000 comma-separated elements are now accepted (up from 10,000), and `[[range_expr('1-3')]]` now counts as two levels of nesting instead of raising an error. (`d343a92`)
+
+### Bug Fixes
+* Fixed `cancel_action` failing with "Cannot cancel: no action is running" when called right after `run_task`, `run_subprocess` or `enter_environment` returned, which let the action run to the end. Waiting for an action to become cancellable is now bounded, so it can't hang forever. (`5a87f2b`)
+* Fixed a deadlock when `cleanup()` ran at the same time as another session call while INFO logging was enabled. Do not call a session action method while holding a lock that one of your logging handlers also takes. (`0ce66a9`)
+* In a Session, spaces around a number in an INT or FLOAT job or task parameter value are now ignored. Before, such a value made the task silently not run. (`4bffece`)
+* `merge_job_parameter_definitions` now returns LIST[FLOAT] defaults as native floats when items are given as strings. For example, `[1.5, "2.50"]` now returns `[1.5, 2.5]` instead of the raw text `'[1.5,"2.50"]'`. (`4d9ed22`)
+* Path mapping no longer adds an extra separator after a destination that already ends with one (rule destination `/dst/` maps `/mnt/a/b` to `/dst/a/b`). `escape_format_string` now escapes a lone `{` before `}}`, so `"{}}"` round-trips correctly. (`cb42782`)
+
+
 ## 0.14.0 (2026-10-15)
 
 
