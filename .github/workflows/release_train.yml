@@ -27,8 +27,9 @@ on:
     # The default branch: a merged bot PR is reported right away instead of on the next schedule.
     branches: [rt-ci]
   # A release: the train sees it without waiting for the schedule. The run is only a signal: it runs this file
-  # from the default branch with the default branch's OIDC subject, and the reusable workflow reads nothing of
-  # the run that triggered it (no artifact, head ref or event payload).
+  # from the default branch with the default branch's OIDC subject. The reusable workflow reads only the
+  # triggering run's conclusion, head repository, head branch and URL, and goes on only for a successful
+  # Publish of this repository's own release branch.
   workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: ["Release: Publish"]
     types: [completed]
@@ -46,20 +47,20 @@ jobs:
     # This fork test points at the fork-testing branch: the reusable workflow's PR head plus rehearsal mode.
     uses: seant-aws/openjd-dot-github/.github/workflows/reusable_release_train.yml@release-train-workflow-rehearsal # zizmor: ignore[unpinned-uses]
     permissions:
-      contents: write # push bot/* branches; create tags and releases (rehearsal only)
+      contents: write # push bot/* branches
       pull-requests: write # open and update the train's PRs and their labels
-      actions: write # dispatch this repository's own Release: Bump (live mode)
+      actions: write # dispatch this repository's own Release: Bump
       id-token: write # OIDC tokens for the AWS role and the gateway
     with:
       mode: ${{ vars.RELEASE_TRAIN_MODE }}
       # This fork test releases from rt-ci (upstream callers keep the default, mainline).
       release_branch: rt-ci
       # The repositories this one may start after a release (also on the train's own allowlist).
-      dispatch_repos: "seant-aws/openjd-sessions-for-python seant-aws/openjd-cli"
+      dispatch_repos: "seant-aws/openjd-sessions-for-python seant-aws/openjd-cli seant-aws/deadline-cloud-worker-agent"
     secrets:
       role_arn: ${{ secrets.RELEASE_TRAIN_ROLE }}
-      # The same secrets as upstream. The dispatch step picks a token by the target's organization
-      # (OpenJobDescription or aws-deadline) and refuses any other owner, so these seant-aws targets are not
-      # dispatched: the downstream forks pick a release up on their daily run or a manual dispatch.
+      # Bot-owned, Actions-only dispatch tokens, one per organization, used only by the dispatch step to run
+      # release_train.yml in dispatch_repos. Optional: without an organization's token its repositories pick a
+      # release up on their daily run.
       dispatch_token_openjd: ${{ secrets.RELEASE_TRAIN_DISPATCH_TOKEN }}
       dispatch_token_aws_deadline: ${{ secrets.RELEASE_TRAIN_DISPATCH_TOKEN_AWS_DEADLINE }}
