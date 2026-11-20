@@ -1,3 +1,10 @@
+## 0.17.0 (2026-11-20)
+
+
+### BREAKING CHANGES
+* Renamed `evaluate_let_bindings` to `apply_let_bindings`. This function updates the symbol table you pass in rather than returning a new one. Change any calls to `evaluate_let_bindings` to use `apply_let_bindings`. (`69524c1`)
+
+
 ## 0.16.0 (2026-11-20)
 
 
