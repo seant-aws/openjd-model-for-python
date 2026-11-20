@@ -737,9 +737,9 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
 name = "openjd-expr"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e5497a00baaedd5a974bca9a06fe8ceae5edbdacadd326d1581eac9f694b2dd"
+checksum = "7d226a202d43a8a07aff8dc6b8b4c5904b54e86776fccf449780c8242d1d81bc"
 dependencies = [
  "regex",
  "regex-syntax",
@@ -756,9 +756,9 @@ dependencies = [
 
 [[package]]
 name = "openjd-model"
-version = "0.16.1"
+version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57060018e26f00956c54f0420b87cfb9f6e8792a2736f31415005e8132ed6462"
+checksum = "5ac2d0a30d3e94abd37b583654df7a01ba108ffb061dc849c063059bd48146e2"
 dependencies = [
  "indexmap",
  "openjd-expr",
@@ -788,9 +788,9 @@ dependencies = [
 
 [[package]]
 name = "openjd-sessions"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ee856d72179ac7c07a963edcf7dda2b3d2576551e4dd1087c734eaba84ceb5f"
+checksum = "fcf880bfccc668b4660507195322a41a34c03f2bba9f6407e48dfa76e3f379f9"
 dependencies = [
  "bitflags",
  "futures-util",
