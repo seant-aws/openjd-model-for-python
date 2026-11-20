@@ -1,3 +1,10 @@
+## 0.16.0 (2026-11-20)
+
+
+### BREAKING CHANGES
+* The bundled Rust expression engine (openjd-expr) has been upgraded from 0.16.0 to 0.17.0, in line with the openjd-model 0.16.2 Rust release. This upgrade is marked as breaking, so expressions may evaluate differently. Check the openjd-expr 0.17.0 release notes for details and re-validate your templates after upgrading. (#23)
+
+
 ## 0.15.0 (2026-11-18)
 
 
