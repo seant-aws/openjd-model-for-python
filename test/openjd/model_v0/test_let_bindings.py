@@ -1,6 +1,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-"""Tests for the v0 ``openjd.model.evaluate_let_bindings`` helper.
+"""Tests for the v0 ``openjd.model.apply_let_bindings`` helper.
 
 This is the shared EXPR ``let``-binding evaluation loop (RFC 0007 §3.6) used
 by the model's job instantiation and by the ``openjd-sessions`` runtime. It
@@ -14,7 +14,7 @@ new symbol table.
 
 import pytest
 
-from openjd.model import SymbolTable, evaluate_let_bindings
+from openjd.model import SymbolTable, apply_let_bindings
 from openjd.model._let_bindings import _parse_rhs
 
 
@@ -24,7 +24,7 @@ class TestEvaluateLetBindings:
         symtab = SymbolTable()
 
         # WHEN
-        evaluate_let_bindings(symtab=symtab, let_bindings=["End = 1 + 9"])
+        apply_let_bindings(symtab=symtab, let_bindings=["End = 1 + 9"])
 
         # THEN
         assert "End" in symtab
@@ -35,7 +35,7 @@ class TestEvaluateLetBindings:
         # so later bindings can reference earlier ones.
         symtab = SymbolTable()
 
-        evaluate_let_bindings(
+        apply_let_bindings(
             symtab=symtab,
             let_bindings=[
                 "A = 10 + 1",
@@ -55,7 +55,7 @@ class TestEvaluateLetBindings:
         symtab["Param.X"] = 10
         symtab.expr_types["Param.X"] = "INT"
 
-        evaluate_let_bindings(symtab=symtab, let_bindings=["Doubled = Param.X * 2"])
+        apply_let_bindings(symtab=symtab, let_bindings=["Doubled = Param.X * 2"])
 
         assert symtab["Doubled"].item() == 20
 
@@ -64,7 +64,7 @@ class TestEvaluateLetBindings:
         # declared trailing zeros survive str() coercion (RFC 0005).
         symtab = SymbolTable()
 
-        evaluate_let_bindings(symtab=symtab, let_bindings=["F = 1.50"])
+        apply_let_bindings(symtab=symtab, let_bindings=["F = 1.50"])
 
         assert str(symtab["F"]) == "1.50"
 
@@ -73,7 +73,7 @@ class TestEvaluateLetBindings:
         # property access on it, matching the Rust runtime's typed table.
         symtab = SymbolTable()
 
-        evaluate_let_bindings(
+        apply_let_bindings(
             symtab=symtab,
             let_bindings=[
                 "P = path('/a/b/render.exr')",
@@ -98,7 +98,7 @@ class TestEvaluateLetBindings:
         # raising or seeding anything.
         symtab = SymbolTable()
 
-        evaluate_let_bindings(symtab=symtab, let_bindings=[binding])
+        apply_let_bindings(symtab=symtab, let_bindings=[binding])
 
         assert len(symtab.symbols) == 0
 
@@ -108,7 +108,7 @@ class TestEvaluateLetBindings:
         symtab = SymbolTable()
 
         with pytest.raises(ValueError) as excinfo:
-            evaluate_let_bindings(symtab=symtab, let_bindings=["X = Undefined.Y + 1"])
+            apply_let_bindings(symtab=symtab, let_bindings=["X = Undefined.Y + 1"])
 
         assert str(excinfo.value).startswith("let binding 'X':")
 
@@ -118,7 +118,7 @@ class TestEvaluateLetBindings:
         symtab = SymbolTable()
 
         with pytest.raises(ValueError) as excinfo:
-            evaluate_let_bindings(symtab=symtab, let_bindings=["Bad = 1 +"])
+            apply_let_bindings(symtab=symtab, let_bindings=["Bad = 1 +"])
 
         assert str(excinfo.value).startswith("let binding 'Bad':")
 
@@ -128,12 +128,12 @@ class TestEvaluateLetBindings:
         # parses once and hits the cache thereafter.
         _parse_rhs.cache_clear()
 
-        evaluate_let_bindings(symtab=SymbolTable(), let_bindings=["A = 2 + 3"])
+        apply_let_bindings(symtab=SymbolTable(), let_bindings=["A = 2 + 3"])
         info = _parse_rhs.cache_info()
         assert info.misses == 1
         assert info.hits == 0
 
-        evaluate_let_bindings(symtab=SymbolTable(), let_bindings=["A = 2 + 3"])
+        apply_let_bindings(symtab=SymbolTable(), let_bindings=["A = 2 + 3"])
         info = _parse_rhs.cache_info()
         assert info.misses == 1
         assert info.hits == 1
@@ -145,7 +145,7 @@ class TestEvaluateLetBindings:
 
         for _ in range(2):
             with pytest.raises(ValueError) as excinfo:
-                evaluate_let_bindings(symtab=SymbolTable(), let_bindings=["Bad = 1 +"])
+                apply_let_bindings(symtab=SymbolTable(), let_bindings=["Bad = 1 +"])
             assert str(excinfo.value).startswith("let binding 'Bad':")
 
         info = _parse_rhs.cache_info()
@@ -172,9 +172,7 @@ class TestPathFormat:
         symtab = SymbolTable()
 
         # WHEN
-        evaluate_let_bindings(
-            symtab=symtab, let_bindings=[self.BINDING], path_format=PathFormat.POSIX
-        )
+        apply_let_bindings(symtab=symtab, let_bindings=[self.BINDING], path_format=PathFormat.POSIX)
 
         # THEN
         assert str(symtab["x"]) == "/a,/b"
@@ -189,7 +187,7 @@ class TestPathFormat:
         symtab = SymbolTable()
 
         # WHEN
-        evaluate_let_bindings(
+        apply_let_bindings(
             symtab=symtab, let_bindings=[self.BINDING], path_format=PathFormat.WINDOWS
         )
 
@@ -205,7 +203,7 @@ class TestPathFormat:
         symtab = SymbolTable()
 
         # WHEN
-        evaluate_let_bindings(symtab=symtab, let_bindings=[self.BINDING])
+        apply_let_bindings(symtab=symtab, let_bindings=[self.BINDING])
 
         # THEN
         expected = "\\a,\\b" if os.name == "nt" else "/a,/b"

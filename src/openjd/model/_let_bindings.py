@@ -22,7 +22,7 @@ from typing import Any, Iterable
 
 from ._symbol_table import SymbolTable
 
-__all__ = ["evaluate_let_bindings"]
+__all__ = ["apply_let_bindings"]
 
 
 @lru_cache(maxsize=1024)
@@ -43,7 +43,7 @@ def _parse_rhs(rhs: str) -> Any:
     return ExprNode(rhs)
 
 
-def evaluate_let_bindings(
+def apply_let_bindings(
     *, symtab: SymbolTable, let_bindings: Iterable[str], path_format: Any = None
 ) -> None:
     """Evaluate EXPR ``let`` bindings in order, seeding each into ``symtab``.

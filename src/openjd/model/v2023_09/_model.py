@@ -3609,9 +3609,9 @@ class StepTemplate(OpenJDModel_v2023_09):
             # reaches this branch, so the load is conditional on EXPR use.
             from openjd.expr import PathFormat
 
-            from .._let_bindings import evaluate_let_bindings
+            from .._let_bindings import apply_let_bindings
 
-            evaluate_let_bindings(
+            apply_let_bindings(
                 symtab=step_symtab, let_bindings=self.let, path_format=PathFormat.POSIX
             )
         return step_symtab

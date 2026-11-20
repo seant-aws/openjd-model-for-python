@@ -33,7 +33,7 @@ from ._step_dependency_graph import (
 )
 from ._step_param_space_iter import StepParameterSpaceIterator
 from ._format_strings import FormatStringError
-from ._let_bindings import evaluate_let_bindings
+from ._let_bindings import apply_let_bindings
 from ._symbol_table import SymbolTable
 from ._types import (
     EnvironmentTemplate,
@@ -62,7 +62,7 @@ __all__ = (
     "decode_environment_template",
     "decode_job_template",
     "document_string_to_object",
-    "evaluate_let_bindings",
+    "apply_let_bindings",
     "merge_job_parameter_definitions",
     "model_to_object",
     "parse_model",
