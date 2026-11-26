@@ -108,7 +108,7 @@ __all__ = ["prevalidate_model_template_variable_references"]
 # 3. An OpenJDModel can export template variable definitions to their parent in the template model, and have to declare which, if any,
 #    of their fields variable definitions are passed in to.
 #    - Information on this is encoded in the model's `_template_variable_sources` field. See the comment for this field in the
-#      OpenJDModel base class for information on this property
+#      OpenJDModel base class for information on this property.
 # 4. Since this validation is a pre-validator, we basically have to re-implement a fragment of Pydantic's model parser for this
 #    depth first traversal. Thus, you'll need to know the following about Pydantic v2's data model and parser to understand this
 #    implementation:
