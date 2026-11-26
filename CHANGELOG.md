@@ -1,3 +1,10 @@
+## 0.18.0 (2026-11-26)
+
+
+### Features
+* mark a rehearsal breaking release ([`cf99ac7`](https://github.com/seant-aws/openjd-model-for-python/commit/cf99ac7446efc8eb091d7aaff2fe41e4852295e9))
+
+
 ## 0.17.1 (2026-11-26)
 
 
