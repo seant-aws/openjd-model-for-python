@@ -1038,3 +1038,5 @@ def _add_symbol(into: ScopedSymtabs, scope: ResolutionScope, symbol_name: str) -
         into[ResolutionScope.TASK].add(symbol_name)
     else:
         into[ResolutionScope.TASK].add(symbol_name)
+
+# Release-train rehearsal marker: no behaviour change.
