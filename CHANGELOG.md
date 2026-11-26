@@ -1,3 +1,10 @@
+## 0.17.1 (2026-11-26)
+
+
+### Bug Fixes
+* add missing period in a variable reference validation comment ([`0ac607f`](https://github.com/seant-aws/openjd-model-for-python/commit/0ac607ffbc899b06bbe2a9b60bf3f8b0651b65e2))
+
+
 ## 0.17.0 (2026-11-20)
 
 
